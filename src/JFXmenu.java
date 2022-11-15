@@ -16,6 +16,8 @@ import javafx.scene.control.Button;
 
 public class JFXmenu extends Application {
     Stage stage = new Stage();
+    Company company = Company.getInstanceOfCompany(); //create the single instance of the Company
+
     public void start(Stage stage){
 
         GridPane pane = new GridPane();
@@ -142,6 +144,7 @@ public class JFXmenu extends Application {
         Scene addEmps = new Scene(pane, 200, 200);
 
         Button toMain = new Button("MENU");
+        Button submit = new Button("Submit");
 
         Label empNamelbl = new Label("Name: ");
         TextArea empNametxt = new TextArea();
@@ -203,6 +206,8 @@ public class JFXmenu extends Application {
         pane.add(empSalarylbl, 0, 7);
         pane.add(empSalarytxt, 1, 7);
 
+        pane.add(submit, 0, 8);
+
 
 
 
@@ -211,6 +216,8 @@ public class JFXmenu extends Application {
         stage.show();
     }
 
+
+
     public void addCustomer(Stage stage){
 
         GridPane pane = new GridPane();
@@ -218,6 +225,7 @@ public class JFXmenu extends Application {
         Scene addCustomer = new Scene(pane, 200, 200);
 
         Button toMain = new Button("MENU");
+        Button submit = new Button("Submit");
 
         Label custNamelbl = new Label("Name: ");
         TextArea custNametxt = new TextArea();
@@ -254,6 +262,8 @@ public class JFXmenu extends Application {
 
         pane.add(custAmtlbl, 0, 4);
         pane.add(custAmttxt, 1, 4);
+
+        pane.add(submit, 0, 5);
 
 
 
