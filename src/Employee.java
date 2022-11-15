@@ -1,0 +1,36 @@
+public class Employee {
+    //class variables
+    private String name;
+    private String address;
+    private String phone;
+    private String title;
+    private boolean isManager;
+    private String birthDate;
+    private Double salary;
+
+    //default constructor
+    public Employee(){
+        this.name = "John Doe";
+        this.address = "135 Default Ln. Wilmington, NC.";
+        this.phone = "(910)-660-1677";
+        this.title = "CEO";
+        this.isManager = false;
+        this.birthDate = "1995/06/16";
+        this.salary = 1.0;
+    }
+
+    //constructor with parameters
+    public Employee(String name, String address, String phone, String title, boolean isManager,
+                    String birthDate, Double salary){
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+        this.title = title;
+        this.isManager = isManager;
+        this.birthDate = birthDate;
+        this.salary = salary;
+    }
+
+
+
+}
