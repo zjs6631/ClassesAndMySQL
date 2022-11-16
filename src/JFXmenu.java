@@ -7,16 +7,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 
+import javax.swing.*;
 
 
 public class JFXmenu extends Application {
     Stage stage = new Stage();
-    Company company = Company.getInstanceOfCompany(); //create the single instance of the Company
+    Company business = Company.getInstanceOfCompany(); //create the single instance of the Company
 
     public void start(Stage stage){
 
@@ -96,6 +96,16 @@ public class JFXmenu extends Application {
             addCustomer(stage);
         }
     }
+
+    class employeeAdded implements EventHandler<ActionEvent>{
+        @Override
+        public void handle(ActionEvent e){
+            Employee employee = new Employee();
+            business.addEmp(employee);
+        };
+    }
+
+
 
     public void viewEmps(Stage stage){
 
@@ -184,6 +194,8 @@ public class JFXmenu extends Application {
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
 
+
+
         pane.add(toMain,0,0);
         pane.add(empNamelbl, 0, 1);
         pane.add(empNametxt, 1, 1);
@@ -215,6 +227,8 @@ public class JFXmenu extends Application {
         stage.setScene(addEmps);
         stage.show();
     }
+
+
 
 
 
