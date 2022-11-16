@@ -98,10 +98,10 @@ public class JFXmenu extends Application {
     }
 
     class employeeAdded implements EventHandler<ActionEvent>{
-        @Override
+
+        public Employee employee;
         public void handle(ActionEvent e){
-            Employee employee = new Employee();
-            business.addEmp(employee);
+            business.employees.add(employee);
         };
     }
 
@@ -114,8 +114,12 @@ public class JFXmenu extends Application {
         Scene viewEmps = new Scene(pane, 200, 200);
 
         Button toMain = new Button("MENU");
-        Label listEmps = new Label("Here's the list");
-
+        TextArea listEmps = new TextArea();
+        for(int i = 0; i < business.employees.size(); i++){
+            Employee currEmployee = business.employees.get(i);
+            listEmps.appendText(currEmployee.name + " " + currEmployee.address + " " + currEmployee.phone + " " +
+                    currEmployee.birthDate + " " + currEmployee.title + " " + currEmployee.salary );
+        }
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
 
@@ -156,6 +160,8 @@ public class JFXmenu extends Application {
         Button toMain = new Button("MENU");
         Button submit = new Button("Submit");
 
+
+
         Label empNamelbl = new Label("Name: ");
         TextArea empNametxt = new TextArea();
         empNametxt.setMaxHeight(12);
@@ -193,6 +199,20 @@ public class JFXmenu extends Application {
 
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
+
+
+
+
+        //EVENT HANDLER using arrow-like syntax will use this for creating customer objects too
+        submit.setOnAction(e -> {
+            Employee newEmployee = new Employee(empNametxt.getText(), empAddresstxt.getText(),
+                    empPhonetxt.getText(), empTitletxt.getText(), empIsManagertxt.getText().equals(false),
+                    empBirthDatetxt.getText(), 0.0);
+
+            business.employees.add(newEmployee);
+            start(stage);
+
+        });
 
 
 

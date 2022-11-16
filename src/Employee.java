@@ -1,12 +1,12 @@
 public class Employee {
     //class variables
-    private String name;
-    private String address;
-    private String phone;
-    private String title;
-    private boolean isManager;
-    private String birthDate;
-    private Double salary;
+    public String name;
+    public String address;
+    public String phone;
+    public String title;
+    public boolean isManager;
+    public String birthDate;
+    public Double salary;
 
     //default constructor
     public Employee(){
