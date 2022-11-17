@@ -3,13 +3,11 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 
 import javax.swing.*;
 
@@ -45,7 +43,7 @@ public class JFXmenu extends Application {
         addCustHandler addCustHndl = new addCustHandler();
         addCustBtn.setOnAction(addCustHndl);
 
-        Scene main = new Scene(pane,200, 200);
+        Scene main = new Scene(pane,500, 500);
         pane.add(title, 0, 0);
         pane.add(viewEmpBtn, 0, 1);
         pane.add(viewCustBtn, 0, 2);
@@ -70,40 +68,33 @@ public class JFXmenu extends Application {
 
 
     class viewEmpHandler implements EventHandler<ActionEvent> {
-        @Override
+
         public void handle(ActionEvent e){
             viewEmps(stage);
         }
     }
 
     class viewCustHandler implements EventHandler<ActionEvent>{
-        @Override
+
         public void handle(ActionEvent e){
             viewCusts(stage);
         }
     }
 
     class addEmpHandler implements EventHandler<ActionEvent>{
-        @Override
+
         public void handle(ActionEvent e){
             addEmployee(stage);
         }
     }
 
     class addCustHandler implements EventHandler<ActionEvent>{
-        @Override
+
         public void handle(ActionEvent e){
             addCustomer(stage);
         }
     }
 
-    class employeeAdded implements EventHandler<ActionEvent>{
-
-        public Employee employee;
-        public void handle(ActionEvent e){
-            business.employees.add(employee);
-        };
-    }
 
 
 
@@ -111,14 +102,14 @@ public class JFXmenu extends Application {
 
         FlowPane pane = new FlowPane();
 
-        Scene viewEmps = new Scene(pane, 200, 200);
+        Scene viewEmps = new Scene(pane, 500, 500);
 
         Button toMain = new Button("MENU");
         TextArea listEmps = new TextArea();
         for(int i = 0; i < business.employees.size(); i++){
             Employee currEmployee = business.employees.get(i);
             listEmps.appendText(currEmployee.name + " " + currEmployee.address + " " + currEmployee.phone + " " +
-                    currEmployee.birthDate + " " + currEmployee.title + " " + currEmployee.salary );
+                    currEmployee.birthDate + " " + currEmployee.title + " " + currEmployee.salary + " " + currEmployee.isManager);
         }
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
@@ -135,16 +126,22 @@ public class JFXmenu extends Application {
 
         FlowPane pane = new FlowPane();
 
-        Scene viewEmps = new Scene(pane, 200, 200);
+        Scene viewEmps = new Scene(pane, 500, 500);
 
         Button toMain = new Button("MENU");
-        Label listEmps = new Label("Here's the list");
+        TextArea listCusts = new TextArea();
+
+        for(int i = 0; i < business.customers.size(); i++){
+            Customer currCustomer = business.customers.get(i);
+            listCusts.appendText(currCustomer.name + " " + currCustomer.address + " " + currCustomer.phone + " " +
+                    currCustomer.amountSpent);
+        }
 
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
 
         pane.getChildren().add(toMain);
-        pane.getChildren().add(listEmps);
+        pane.getChildren().add(listCusts);
 
         stage.setTitle("Customers");
         stage.setScene(viewEmps);
@@ -155,7 +152,7 @@ public class JFXmenu extends Application {
 
         GridPane pane = new GridPane();
 
-        Scene addEmps = new Scene(pane, 200, 200);
+        Scene addEmps = new Scene(pane, 500, 500);
 
         Button toMain = new Button("MENU");
         Button submit = new Button("Submit");
@@ -172,7 +169,7 @@ public class JFXmenu extends Application {
         empAddresstxt.setMaxHeight(12);
         empAddresstxt.setMaxWidth(100);
 
-        Label empPhonelbl = new Label("Phone: ");
+        Label empPhonelbl = new Label("Phone (numbers only): ");
         TextArea empPhonetxt = new TextArea();
         empPhonetxt.setMaxHeight(12);
         empPhonetxt.setMaxWidth(100);
@@ -182,20 +179,26 @@ public class JFXmenu extends Application {
         empTitletxt.setMaxHeight(12);
         empTitletxt.setMaxWidth(100);
 
-        Label empIsManagerlbl = new Label("Manager: ");
-        TextArea empIsManagertxt = new TextArea();
-        empIsManagertxt.setMaxHeight(12);
-        empIsManagertxt.setMaxWidth(100);
+        final ToggleGroup managerial = new ToggleGroup();
 
-        Label empBirthDatelbl = new Label("Birth Date: ");
+        RadioButton empIsManagerBtn = new RadioButton("Manager");
+        empIsManagerBtn.setToggleGroup(managerial);
+        RadioButton empNonManagerBtn = new RadioButton("Non-manager");
+        empNonManagerBtn.setToggleGroup(managerial);
+        empNonManagerBtn.setSelected(true);
+
+        Label empBirthDatelbl = new Label("Birth Date (YYYY/MM/DD): ");
         TextArea empBirthDatetxt = new TextArea();
         empBirthDatetxt.setMaxHeight(12);
         empBirthDatetxt.setMaxWidth(100);
 
-        Label empSalarylbl = new Label("Salary: ");
+        Label empSalarylbl = new Label("Salary (numbers only): ");
         TextArea empSalarytxt = new TextArea();
         empSalarytxt.setMaxHeight(12);
         empSalarytxt.setMaxWidth(100);
+
+        Label errorLbl = new Label();
+
 
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
@@ -205,12 +208,58 @@ public class JFXmenu extends Application {
 
         //EVENT HANDLER using arrow-like syntax will use this for creating customer objects too
         submit.setOnAction(e -> {
-            Employee newEmployee = new Employee(empNametxt.getText(), empAddresstxt.getText(),
-                    empPhonetxt.getText(), empTitletxt.getText(), empIsManagertxt.getText().equals(false),
-                    empBirthDatetxt.getText(), 0.0);
+            String nameField = empNametxt.getText(),
+                    addressField = empAddresstxt.getText(),
+                    phoneField = empPhonetxt.getText(),
+                    titleField = empTitletxt.getText(),
+                    birthDateField = empBirthDatetxt.getText();
+            Double salaryField;
 
-            business.employees.add(newEmployee);
-            start(stage);
+            boolean validPhone = true;
+            boolean validBirthDate = true;
+            boolean validSalary = true;
+
+            for(int i = 0; i < phoneField.length(); i++){
+                if(!Character.isDigit(phoneField.charAt(i))){
+                    validPhone = false;
+                    errorLbl.setText("Invalid Phone number! Numbers only please.");
+                }
+            }
+
+            try{
+                Double.parseDouble(empSalarytxt.getText());
+            }catch(NumberFormatException b){
+                validSalary = false;
+                errorLbl.setText("Invalid Salary! Numbers only please.");
+            }
+
+            if(birthDateField.length() != 10 || birthDateField.charAt(4) != '/' || birthDateField.charAt(7) != '/'){
+                validBirthDate = false;
+                errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+            }
+
+            for(int i = 0; i < birthDateField.length(); i++){
+                if(i <4 && !Character.isDigit(birthDateField.charAt(i))){
+                    validBirthDate = false;
+                    errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                } else if (i > 4 && i < 7 && !Character.isDigit(birthDateField.charAt(i))){
+                    validBirthDate = false;
+                    errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                } else if (i > 7 && !Character.isDigit(birthDateField.charAt(i))){
+                    validBirthDate = false;
+                    errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                }
+            }
+
+            if(validPhone && validBirthDate && validSalary) {
+                salaryField = Double.parseDouble(empSalarytxt.getText());
+                Employee newEmployee = new Employee(nameField, addressField,
+                        phoneField, titleField, empIsManagerBtn.isSelected(),
+                        birthDateField, salaryField);
+
+                business.employees.add(newEmployee);
+                start(stage);
+            }
 
         });
 
@@ -229,8 +278,8 @@ public class JFXmenu extends Application {
         pane.add(empTitlelbl, 0, 4);
         pane.add(empTitletxt, 1, 4);
 
-        pane.add(empIsManagerlbl, 0, 5);
-        pane.add(empIsManagertxt, 1, 5);
+        pane.add(empIsManagerBtn, 0, 5);
+        pane.add(empNonManagerBtn, 1, 5);
 
         pane.add(empBirthDatelbl, 0, 6);
         pane.add(empBirthDatetxt, 1, 6);
@@ -240,7 +289,7 @@ public class JFXmenu extends Application {
 
         pane.add(submit, 0, 8);
 
-
+        pane.add(errorLbl, 0, 9);
 
 
         stage.setTitle("Add Employee");
@@ -256,7 +305,7 @@ public class JFXmenu extends Application {
 
         GridPane pane = new GridPane();
 
-        Scene addCustomer = new Scene(pane, 200, 200);
+        Scene addCustomer = new Scene(pane, 500, 500);
 
         Button toMain = new Button("MENU");
         Button submit = new Button("Submit");
@@ -271,15 +320,17 @@ public class JFXmenu extends Application {
         custAddresstxt.setMaxHeight(12);
         custAddresstxt.setMaxWidth(100);
 
-        Label custPhonelbl = new Label("Phone: ");
+        Label custPhonelbl = new Label("Phone (numbers only): ");
         TextArea custPhonetxt = new TextArea();
         custPhonetxt.setMaxHeight(12);
         custPhonetxt.setMaxWidth(100);
 
-        Label custAmtlbl = new Label("Amount Spent: ");
+        Label custAmtlbl = new Label("Amount Spent (numbers only): ");
         TextArea custAmttxt = new TextArea();
         custAmttxt.setMaxHeight(12);
         custAmttxt.setMaxWidth(100);
+
+        Label errorLabel = new Label();
 
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
@@ -299,8 +350,42 @@ public class JFXmenu extends Application {
 
         pane.add(submit, 0, 5);
 
+        pane.add(errorLabel, 0, 6);
 
 
+        //EVENT HANDLER using arrow-like syntax to add customer to customer array in business obj
+        submit.setOnAction(e -> {
+
+            String custName = custNametxt.getText(),
+                    custAddress = custAddresstxt.getText(),
+                    custPhone = custPhonetxt.getText(),
+                    custAmountSpent = custAmttxt.getText();
+
+            boolean validPhone = true;
+            boolean validAmountSpent = true;
+
+            for(int i = 0; i < custPhone.length(); i++){
+                if(!Character.isDigit(custPhone.charAt(i))){
+                    validPhone = false;
+                    errorLabel.setText("Invalid Phone Number provided. Numbers only please.");
+                }
+            }
+
+            for(int i=0; i < custAmountSpent.length(); i++){
+                if(!Character.isDigit(custAmountSpent.charAt(i))){
+                    validAmountSpent = false;
+                    errorLabel.setText("Invalid Amount Spent provided. Numbers only please.");
+                }
+            }
+            if(validPhone && validAmountSpent) {
+                Customer newCustomer = new Customer(custName, custAddress,
+                        custPhone, Double.parseDouble(custAmountSpent));
+
+                business.customers.add(newCustomer);
+                start(stage);
+            }
+
+        });
 
 
 

@@ -1,5 +1,8 @@
+import java.util.UUID;
+
 public class Employee {
     //class variables
+    public String uniqueID;
     public String name;
     public String address;
     public String phone;
@@ -22,6 +25,7 @@ public class Employee {
     //constructor with parameters
     public Employee(String name, String address, String phone, String title, boolean isManager,
                     String birthDate, Double salary){
+        this.uniqueID = UUID.randomUUID().toString();
         this.name = name;
         this.address = address;
         this.phone = phone;

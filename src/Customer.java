@@ -1,8 +1,11 @@
+import java.util.UUID;
+
 public class Customer {
-    private String name;
-    private String address;
-    private String phone;
-    private Double amountSpent;
+    public String uniqueID;
+    public String name;
+    public String address;
+    public String phone;
+    public Double amountSpent;
 
     public Customer(){
         this.name = "John Doe";
@@ -12,6 +15,7 @@ public class Customer {
     }
 
     public Customer(String name, String address, String phone, Double amountSpent){
+        this.uniqueID = UUID.randomUUID().toString();
         this.name = name;
         this.address = address;
         this.phone = phone;
