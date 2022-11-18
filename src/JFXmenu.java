@@ -10,9 +10,7 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 
 public class JFXmenu extends Application {
@@ -399,9 +397,14 @@ public class JFXmenu extends Application {
 
 
     public static void main(String[] args) {
+
+        Application.launch(args);
+
         String url = "jdbc:mysql://192.168.1.21:3306/company";
         String username = "zjs6631";
         String password = "Simpson1002!";
+        String custQuery = "select * from customers";
+        String empQuery = "select * from employees";
         System.out.println("Connecting to database...");
 
         System.out.println("Loading driver...");
@@ -409,14 +412,19 @@ public class JFXmenu extends Application {
 
 
         try (Connection connection = DriverManager.getConnection(url, username, password)){
-
             System.out.println("Database Connected");
+            Statement statement = connection.createStatement();
+            ResultSet custResult = statement.executeQuery(custQuery);
+            ResultSet empResult = statement.executeQuery(empQuery);
+            while(custResult.next()){
+
+            }
 
         } catch (SQLException e){
             throw new IllegalStateException("Cannot connect to the database!", e);
         }
 
 
-        Application.launch(args);
+
     }
 }
