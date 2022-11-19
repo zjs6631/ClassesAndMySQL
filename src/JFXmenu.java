@@ -17,7 +17,7 @@ public class JFXmenu extends Application {
 
     String url = "jdbc:mysql://localhost:3306/company";
     String username = "zjs6631";
-    String password = "Simpson1002!";
+    String password = "mySQL4840";
 
 
     Connection connection;
