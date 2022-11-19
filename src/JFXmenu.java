@@ -8,14 +8,73 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-
-import javax.swing.*;
 import java.sql.*;
 
 
 public class JFXmenu extends Application {
     Stage stage = new Stage();
     Company business = Company.getInstanceOfCompany(); //create the single instance of the Company
+
+    String url = "jdbc:mysql://localhost:3306/company";
+    String username = "zjs6631";
+    String password = "Simpson1002!";
+
+
+    Connection connection;
+
+    {
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    Statement statement;
+
+    {
+        try {
+            statement = connection.createStatement();
+            String empQuery = "select * from employees";
+            ResultSet empResults = statement.executeQuery(empQuery);
+            while(empResults.next()) {
+                String name = empResults.getString("name");
+                String address = empResults.getString("address");
+                String phone = empResults.getString("phone");
+                String title = empResults.getString("title");
+                Boolean isManager = empResults.getBoolean("isManager");
+                String birthDate = empResults.getString("birthDate");
+                Double salary = empResults.getDouble("salary");
+
+                Employee currEmployee = new Employee(name, address, phone, title, isManager, birthDate, salary);
+
+                business.employees.add(currEmployee);
+
+            }
+            empResults.close();
+
+            String custQuery = "select * from customers";
+            ResultSet custResults = statement.executeQuery(custQuery);
+            while(custResults.next()){
+                String name = custResults.getString("name");
+                String address = custResults.getString("address");
+                String phone = custResults.getString("phone");
+                Double amntSpent = custResults.getDouble("amountSpent");
+
+                Customer currCustomer = new Customer(name, address, phone, amntSpent);
+
+                business.customers.add(currCustomer);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
 
     public void start(Stage stage){
 
@@ -31,18 +90,43 @@ public class JFXmenu extends Application {
         Button addCustBtn = new Button("Add Customer");
         Button removeEmpBtn = new Button("Remove Employee");
         Button removeCustBtn = new Button("Remove Customer");
+        Button updateEmpBtn = new Button("Update Employee");
+        Button updateCustBtn = new Button("Update Customer");
 
-        viewEmpHandler viewEmpHndl = new viewEmpHandler();
-        viewEmpBtn.setOnAction(viewEmpHndl);
 
-        viewCustHandler viewCustHndl = new viewCustHandler();
-        viewCustBtn.setOnAction(viewCustHndl);
+        viewEmpBtn.setOnAction(e->{
+            viewEmps(stage);
+        });
 
-        addEmpHandler addEmpHndl = new addEmpHandler();
-        addEmpBtn.setOnAction(addEmpHndl);
+        viewCustBtn.setOnAction(e->{
+            viewCusts(stage);
+        });
 
-        addCustHandler addCustHndl = new addCustHandler();
-        addCustBtn.setOnAction(addCustHndl);
+        addEmpBtn.setOnAction(e->{
+            addEmployee(stage);
+        });
+
+        addCustBtn.setOnAction(e->{
+            addCustomer(stage);
+        });
+
+        removeEmpBtn.setOnAction(e->{
+            removeEmployee(stage);
+        });
+
+        removeCustBtn.setOnAction(e->{
+            removeCustomer(stage);
+        });
+
+        updateEmpBtn.setOnAction(e->{
+            updateEmployee(stage);
+        });
+
+        updateCustBtn.setOnAction(e->{
+            updateCustomers(stage);
+        });
+
+
 
         Scene main = new Scene(pane,500, 500);
         pane.add(title, 0, 0);
@@ -52,6 +136,9 @@ public class JFXmenu extends Application {
         pane.add(addCustBtn, 0, 4);
         pane.add(removeEmpBtn, 0, 5);
         pane.add(removeCustBtn, 0, 6);
+        pane.add(updateEmpBtn, 0, 7);
+        pane.add(updateCustBtn, 0, 8);
+
 
         stage.setTitle("Main Menu");
         stage.setScene(main);
@@ -67,38 +154,6 @@ public class JFXmenu extends Application {
 
     }
 
-
-    class viewEmpHandler implements EventHandler<ActionEvent> {
-
-        public void handle(ActionEvent e){
-            viewEmps(stage);
-        }
-    }
-
-    class viewCustHandler implements EventHandler<ActionEvent>{
-
-        public void handle(ActionEvent e){
-            viewCusts(stage);
-        }
-    }
-
-    class addEmpHandler implements EventHandler<ActionEvent>{
-
-        public void handle(ActionEvent e){
-            addEmployee(stage);
-        }
-    }
-
-    class addCustHandler implements EventHandler<ActionEvent>{
-
-        public void handle(ActionEvent e){
-            addCustomer(stage);
-        }
-    }
-
-
-
-
     public void viewEmps(Stage stage){
 
         FlowPane pane = new FlowPane();
@@ -107,10 +162,11 @@ public class JFXmenu extends Application {
 
         Button toMain = new Button("MENU");
         TextArea listEmps = new TextArea();
+        listEmps.setWrapText(true);
         for(int i = 0; i < business.employees.size(); i++){
             Employee currEmployee = business.employees.get(i);
             listEmps.appendText(currEmployee.name + " " + currEmployee.address + " " + currEmployee.phone + " " +
-                    currEmployee.birthDate + " " + currEmployee.title + " " + currEmployee.salary + " " + currEmployee.isManager);
+                    currEmployee.birthDate + " " + currEmployee.title + " " + currEmployee.salary + " " + currEmployee.isManager + "\n");
         }
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
         toMain.setOnAction(viewHomeHandle);
@@ -135,7 +191,7 @@ public class JFXmenu extends Application {
         for(int i = 0; i < business.customers.size(); i++){
             Customer currCustomer = business.customers.get(i);
             listCusts.appendText(currCustomer.name + " " + currCustomer.address + " " + currCustomer.phone + " " +
-                    currCustomer.amountSpent);
+                    currCustomer.amountSpent + "\n");
         }
 
         viewHomeHandler viewHomeHandle = new viewHomeHandler();
@@ -259,6 +315,24 @@ public class JFXmenu extends Application {
                         birthDateField, salaryField);
 
                 business.employees.add(newEmployee);
+                try {
+                    Statement addEmp = connection.createStatement();
+                    String updateEmps = "INSERT INTO employees (name, address, phone, title, isManager, "
+                            + "birthdate, salary) VALUES ('" + nameField +"', '" + addressField + "', '" + phoneField +
+                            "', '" + titleField + "', " + empIsManagerBtn.isSelected() + ", '" + birthDateField + "', " +
+                            salaryField + ")";
+                    addEmp.executeUpdate(updateEmps);
+                    addEmp.close();
+                }catch(SQLException ex){
+
+                    System.out.println(ex);
+
+                    String updateEmps = "INSERT INTO employees (name, address, phone, title, isManager, "
+                            + "birthdate, salary) VALUES ('" + nameField +"', '" + addressField + "', '" + phoneField +
+                            "', '" + titleField + "', " + empIsManagerBtn.isSelected() + ", '" + birthDateField + "', " +
+                            salaryField + ")";
+                    System.out.println(updateEmps);
+                }
                 start(stage);
             }
 
@@ -383,6 +457,23 @@ public class JFXmenu extends Application {
                         custPhone, Double.parseDouble(custAmountSpent));
 
                 business.customers.add(newCustomer);
+
+                try {
+                    Statement addCust = connection.createStatement();
+                    String updateCusts = "INSERT INTO customers (name, address, phone, amountSpent) VALUES ('" + custName +"', '" + custAddress + "', '" + custPhone +
+                            "', " + Double.parseDouble(custAmountSpent) + ")";
+                    addCust.executeUpdate(updateCusts);
+                    addCust.close();
+                }catch(SQLException ex){
+
+                    System.out.println(ex);
+
+                    String updateCusts = "INSERT INTO employees (name, address, phone, title, isManager, "
+                            + "birthdate, salary) VALUES ('" + custName +"', '" + custAddress + "', '" + custPhone +
+                            "', '" + custAmountSpent + ")";
+                    System.out.println(updateCusts);
+                }
+
                 start(stage);
             }
 
@@ -395,36 +486,485 @@ public class JFXmenu extends Application {
         stage.show();
     }
 
+    public void removeEmployee(Stage stage){
+
+        GridPane pane = new GridPane();
+        Scene removeEmp = new Scene(pane, 500, 500);
+
+        Button menu = new Button("MENU");
+
+        viewHomeHandler viewHomeHandle = new viewHomeHandler();
+        menu.setOnAction(viewHomeHandle);
+
+        Label nameLbl = new Label("Name");
+        TextArea nameTxt = new TextArea();
+
+        nameTxt.setMaxWidth(100);
+        nameTxt.setMaxHeight(12);
+
+        Label phoneLbl = new Label("Phone");
+        TextArea phoneTxt = new TextArea();
+        phoneTxt.setMaxWidth(100);
+        phoneTxt.setMaxHeight(12);
+
+        Button submit = new Button("DELETE");
+
+        submit.setOnAction(e->{
+            String name = nameTxt.getText();
+            String phone = phoneTxt.getText();
+
+            try{
+                Statement removeEmployee = connection.createStatement();
+
+                int targEmployeeIndex = -1;
+
+                for (Employee employee : business.employees) {
+                    if(employee.name.equals(name) && employee.phone.equals(phone)){
+                        targEmployeeIndex = business.employees.indexOf(employee);
+                    }
+                }
+                if(targEmployeeIndex != -1){
+                    business.employees.remove(targEmployeeIndex);
+                    String updateEmployees = "DELETE FROM employees WHERE (name= '" + name + "' && phone= '"+phone+"')";
+                    removeEmployee.executeUpdate(updateEmployees);
+                    removeEmployee.close();
+                } else {
+                    System.out.println("Employee not found.");
+                }
+
+
+
+                start(stage);
+
+
+            }catch(SQLException ex){
+                System.out.println(ex);
+            }
+
+        });
+
+        pane.add(menu, 0, 0);
+        pane.add(nameLbl, 0, 1);
+        pane.add(nameTxt, 1, 1);
+        pane.add(phoneLbl, 0, 2);
+        pane.add(phoneTxt, 1, 2);
+        pane.add(submit, 0, 3);
+
+        stage.setTitle("Remove Employee");
+        stage.setScene(removeEmp);
+        stage.show();
+
+
+    }
+
+    public void removeCustomer(Stage stage){
+
+        GridPane pane = new GridPane();
+        Scene removeCust = new Scene(pane, 500, 500);
+
+        Button menu = new Button("MENU");
+
+        viewHomeHandler viewHomeHandle = new viewHomeHandler();
+        menu.setOnAction(viewHomeHandle);
+
+        Label nameLbl = new Label("Name");
+        TextArea nameTxt = new TextArea();
+
+        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxWidth(100);
+
+        Label phoneLbl = new Label("Phone");
+        TextArea phoneTxt = new TextArea();
+
+        phoneTxt.setMaxWidth(100);
+        phoneTxt.setMaxHeight(12);
+
+        Button submit = new Button("DELETE");
+
+        submit.setOnAction(e-> {
+                    String name = nameTxt.getText();
+                    String phone = phoneTxt.getText();
+
+                    try {
+                        Statement removeCustomer = connection.createStatement();
+
+                        int targIndex = -1;
+                        for (Customer customer : business.customers) {
+                            if (customer.name.equals(name) && customer.phone.equals(phone)) {
+                                targIndex = business.customers.indexOf(customer);
+                            }
+                        }
+                        if(targIndex != -1) {
+                            business.customers.remove(targIndex);
+                            String updateCustomers = "DELETE FROM customers WHERE (name= '" + name + "' && phone= '" + phone + "')";
+                            removeCustomer.executeUpdate(updateCustomers);
+                            removeCustomer.close();
+                        } else {
+                            System.out.println("Customer not found.");
+                        }
+
+                        start(stage);
+
+                    } catch (SQLException ex) {
+                        System.out.println(ex);
+                    }
+                });
+
+        pane.add(menu, 0, 0);
+        pane.add(nameLbl, 0, 1);
+        pane.add(nameTxt, 1, 1);
+        pane.add(phoneLbl, 0, 2);
+        pane.add(phoneTxt, 1, 2);
+        pane.add(submit, 0, 3);
+
+        stage.setTitle("Remove Customer");
+        stage.setScene(removeCust);
+        stage.show();
+
+
+    }
+
+    public void updateCustomers(Stage stage){
+        GridPane pane = new GridPane();
+        Scene updateCust = new Scene(pane, 500, 500);
+
+        Button menu = new Button("MENU");
+
+        viewHomeHandler viewHomeHandle = new viewHomeHandler();
+        menu.setOnAction(viewHomeHandle);
+
+        Label nameLbl = new Label("Name");
+        TextArea nameTxt = new TextArea();
+
+        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxWidth(100);
+
+        Label phoneLbl = new Label("Phone");
+        TextArea phoneTxt = new TextArea();
+
+        phoneTxt.setMaxHeight(12);
+        phoneTxt.setMaxWidth(100);
+
+        Button search = new Button("SEARCH");
+
+        search.setOnAction(e->{
+
+            String targName = nameTxt.getText();
+            String targPhone = phoneTxt.getText();
+
+            int targCustIndex = -1;
+
+            for(Customer customer : business.customers){
+                if(customer.name.equals(targName) && customer.phone.equals(targPhone)){
+                    targCustIndex = business.customers.indexOf(customer);
+                }
+            }
+
+            if(targCustIndex != -1){
+
+                int finalTargCustIndex = targCustIndex;
+                Customer targetCustomer = business.customers.get(finalTargCustIndex);
+
+                Label newNameLbl = new Label("Name: ");
+                TextArea newNameTxt = new TextArea(targetCustomer.name);
+
+                newNameTxt.setMaxWidth(100);
+                newNameTxt.setMaxHeight(12);
+
+                Label newAddressLbl = new Label("Address: ");
+                TextArea newAddressTxt = new TextArea(targetCustomer.address);
+
+                newAddressTxt.setMaxHeight(12);
+                newAddressTxt.setMaxWidth(100);
+
+                Label newPhoneLbl = new Label("Phone: ");
+                TextArea newPhoneTxt = new TextArea(targetCustomer.phone);
+
+                newPhoneTxt.setMaxWidth(100);
+                newPhoneTxt.setMaxHeight(12);
+
+                Label newAmountSpentLbl = new Label("Title: ");
+                TextArea newAmountSpentTxt = new TextArea(targetCustomer.amountSpent.toString());
+
+                newAmountSpentTxt.setMaxHeight(12);
+                newAmountSpentTxt.setMaxWidth(100);
+
+
+                Button submit = new Button("SUBMIT UPDATES");
+
+                Label errorLbl = new Label("");
+
+
+                submit.setOnAction(a->{
+                    boolean validPhone = true;
+                    boolean validSalary = true;
+
+                    for(int i = 0; i < newPhoneTxt.getText().length(); i++){
+                        if(!Character.isDigit(newPhoneTxt.getText().charAt(i))){
+                            validPhone = false;
+                            errorLbl.setText("Invalid Phone number! Numbers only please.");
+                        }
+                    }
+
+                    try{
+                        Double.parseDouble(newAmountSpentTxt.getText());
+                    }catch(NumberFormatException b){
+                        validSalary = false;
+                        errorLbl.setText("Invalid Salary! Numbers only please.");
+                    }
+
+
+                    if(validPhone && validSalary){
+                        Customer targ = business.customers.get(finalTargCustIndex);
+                        targ.name = newNameTxt.getText();
+                        targ.address = newAddressTxt.getText();
+                        targ.phone = newPhoneTxt.getText();
+                        targ.amountSpent = Double.parseDouble(newAmountSpentTxt.getText());
+
+                        try {
+                            Statement updateCustomer = connection.createStatement();
+
+                            String updateCustomers = "UPDATE customers SET name = '"+ newNameTxt.getText() +
+                                    "', address='" + newAddressTxt.getText() + "', phone='" + newPhoneTxt.getText() + "', amountSpent=" +
+                            Double.parseDouble(newAmountSpentTxt.getText()) + " WHERE (name= '" + targName + "' && phone= '" + targPhone + "')";
+                            updateCustomer.executeUpdate(updateCustomers);
+                            updateCustomer.close();
+
+                            start(stage);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+
+                            String updateCustomers = "UPDATE customers SET name = '"+ newNameTxt.getText() +
+                                    "', address='" + newAddressTxt.getText() + "', phone='" + newPhoneTxt.getText() + "', amountSpent=" +
+                                    Double.parseDouble(newAmountSpentTxt.getText()) + " WHERE (name= '" + targName + "' && phone= '" + targPhone + "')";
+
+                            System.out.println(updateCustomers);
+                        }
+
+
+                    }
+                });
+
+                pane.add(newNameLbl, 0, 5);
+                pane.add(newNameTxt, 1, 5);
+                pane.add(newAddressLbl, 0, 6);
+                pane.add(newAddressTxt, 1, 6);
+                pane.add(newPhoneLbl, 0, 7);
+                pane.add(newPhoneTxt, 1, 7);
+                pane.add(newAmountSpentLbl, 0, 8);
+                pane.add(newAmountSpentTxt, 1, 8);
+
+                pane.add(submit, 0, 10);
+                pane.add(errorLbl, 0, 11);
+            }
+        });
+         pane.add(menu, 0, 0);
+         pane.add(nameLbl, 0, 1);
+         pane.add(nameTxt, 1, 1);
+         pane.add(phoneLbl, 0, 2);
+         pane.add(phoneTxt, 1, 2);
+         pane.add(search, 0, 3);
+
+        stage.setTitle("Update Customers");
+        stage.setScene(updateCust);
+        stage.show();
+    };
+
+    public void updateEmployee(Stage stage){
+        GridPane pane = new GridPane();
+        Scene updateEmp = new Scene(pane, 500, 500);
+
+        Button menu = new Button("MENU");
+
+        viewHomeHandler viewHomeHandle = new viewHomeHandler();
+        menu.setOnAction(viewHomeHandle);
+
+        Label nameLbl = new Label("Name");
+        TextArea nameTxt = new TextArea();
+
+        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxWidth(100);
+
+        Label phoneLbl = new Label("Phone");
+        TextArea phoneTxt = new TextArea();
+
+        phoneTxt.setMaxHeight(12);
+        phoneTxt.setMaxWidth(100);
+
+        Button search = new Button("SEARCH");
+
+        search.setOnAction(e->{
+
+            String targName = nameTxt.getText();
+            String targPhone = phoneTxt.getText();
+
+            int targEmpIndex = -1;
+
+            for(Employee employee : business.employees){
+                if(employee.name.equals(targName) && employee.phone.equals(targPhone)){
+                    targEmpIndex = business.employees.indexOf(employee);
+                }
+            }
+
+            if(targEmpIndex != -1){
+
+                int finalTargEmpIndex = targEmpIndex;
+                Employee targetEmployee = business.employees.get(finalTargEmpIndex);
+
+                Label newNameLbl = new Label("Name: ");
+                TextArea newNameTxt = new TextArea(targetEmployee.name);
+
+                newNameTxt.setMaxWidth(100);
+                newNameTxt.setMaxHeight(12);
+
+                Label newAddressLbl = new Label("Address: ");
+                TextArea newAddressTxt = new TextArea(targetEmployee.address);
+
+                newAddressTxt.setMaxHeight(12);
+                newAddressTxt.setMaxWidth(100);
+
+                Label newPhoneLbl = new Label("Phone: ");
+                TextArea newPhoneTxt = new TextArea(targetEmployee.phone);
+
+                newPhoneTxt.setMaxWidth(100);
+                newPhoneTxt.setMaxHeight(12);
+
+                Label newTitleLbl = new Label("Title: ");
+                TextArea newTitleTxt = new TextArea(targetEmployee.title);
+
+                newTitleTxt.setMaxHeight(12);
+                newTitleTxt.setMaxWidth(100);
+
+                final ToggleGroup managerial = new ToggleGroup();
+
+                RadioButton empIsManagerBtn = new RadioButton("Manager");
+                empIsManagerBtn.setToggleGroup(managerial);
+                RadioButton empNonManagerBtn = new RadioButton("Non-manager");
+                empNonManagerBtn.setToggleGroup(managerial);
+                empNonManagerBtn.setSelected(true);
+
+                Label newBirthDateLbl = new Label("Birth Date: ");
+                TextArea newBirthDateTxt = new TextArea(targetEmployee.birthDate);
+
+                newBirthDateTxt.setMaxHeight(12);
+                newBirthDateTxt.setMaxWidth(100);
+
+                Label newSalaryLbl = new Label("Salary: ");
+                TextArea newSalaryTxt = new TextArea(targetEmployee.salary.toString());
+
+                newSalaryTxt.setMaxHeight(12);
+                newSalaryTxt.setMaxWidth(100);
+
+                Button submit = new Button("SUBMIT UPDATES");
+
+                Label errorLbl = new Label("");
+
+
+                submit.setOnAction(a->{
+                    boolean validPhone = true;
+                    boolean validBirthDate = true;
+                    boolean validSalary = true;
+
+                    for(int i = 0; i < newPhoneTxt.getText().length(); i++){
+                        if(!Character.isDigit(newPhoneTxt.getText().charAt(i))){
+                            validPhone = false;
+                            errorLbl.setText("Invalid Phone number! Numbers only please.");
+                        }
+                    }
+
+                    try{
+                        Double.parseDouble(newSalaryTxt.getText());
+                    }catch(NumberFormatException b){
+                        validSalary = false;
+                        errorLbl.setText("Invalid Salary! Numbers only please.");
+                    }
+
+                    if(newBirthDateTxt.getText().length() != 10 || newBirthDateTxt.getText().charAt(4) != '/' || newBirthDateTxt.getText().charAt(7) != '/'){
+                        validBirthDate = false;
+                        errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                    }
+
+                    for(int i = 0; i < newBirthDateTxt.getText().length(); i++){
+                        if(i <4 && !Character.isDigit(newBirthDateTxt.getText().charAt(i))){
+                            validBirthDate = false;
+                            errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                        } else if (i > 4 && i < 7 && !Character.isDigit(newBirthDateTxt.getText().charAt(i))){
+                            validBirthDate = false;
+                            errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                        } else if (i > 7 && !Character.isDigit(newBirthDateTxt.getText().charAt(i))){
+                            validBirthDate = false;
+                            errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                        }
+                    }
+
+                    if(validPhone && validBirthDate && validSalary){
+                        Employee targ = business.employees.get(finalTargEmpIndex);
+                        targ.name = newNameTxt.getText();
+                        targ.address = newAddressTxt.getText();
+                        targ.phone = newPhoneTxt.getText();
+                        targ.title = newTitleTxt.getText();
+                        targ.isManager = empIsManagerBtn.isSelected();
+                        targ.birthDate = newBirthDateTxt.getText();
+                        targ.salary = Double.parseDouble(newSalaryTxt.getText());
+
+                        try {
+                            Statement updateEmployee = connection.createStatement();
+
+                            String updateCustomers = "UPDATE employees SET name = '"+ newNameTxt.getText() +
+                                    "', address='" + newAddressTxt.getText() + "', phone='" + newPhoneTxt.getText() + "', title='" +
+                                    newTitleTxt.getText() + "', isManager=" + empIsManagerBtn.isSelected() + ", birthDate='" + newBirthDateTxt.getText() +
+                                    "', salary=" + Double.parseDouble(newSalaryTxt.getText()) + " WHERE (name= '" + targName + "' && phone= '" + targPhone + "')";
+                            updateEmployee.executeUpdate(updateCustomers);
+                            updateEmployee.close();
+
+                            start(stage);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+
+                            String updateCustomers = "UPDATE employees SET name = '"+ newNameTxt.getText() +
+                                    "', address='" + newAddressTxt.getText() + "', phone='" + newPhoneTxt.getText() + "', title='" +
+                                    newTitleTxt.getText() + "', isManager=" + empIsManagerBtn.isSelected() + ", birthDate='" + newBirthDateTxt.getText() +
+                                    "', salary=" + Double.parseDouble(newSalaryTxt.getText()) + " WHERE (name= '" + targName + "' && phone= '" + targPhone + "')";
+                        }
+
+
+                    }
+                });
+
+                pane.add(newNameLbl, 0, 5);
+                pane.add(newNameTxt, 1, 5);
+                pane.add(newAddressLbl, 0, 6);
+                pane.add(newAddressTxt, 1, 6);
+                pane.add(newPhoneLbl, 0, 7);
+                pane.add(newPhoneTxt, 1, 7);
+                pane.add(newTitleLbl, 0, 8);
+                pane.add(newTitleTxt, 1, 8);
+                pane.add(empIsManagerBtn, 0, 9);
+                pane.add(empNonManagerBtn, 1, 9);
+                pane.add(newBirthDateLbl, 0, 10);
+                pane.add(newBirthDateTxt, 1, 10);
+                pane.add(newSalaryLbl, 0, 11);
+                pane.add(newSalaryTxt, 1, 11);
+                pane.add(submit, 0, 12);
+                pane.add(errorLbl, 0, 13);
+            }
+        });
+        pane.add(menu, 0, 0);
+        pane.add(nameLbl, 0, 1);
+        pane.add(nameTxt, 1, 1);
+        pane.add(phoneLbl, 0, 2);
+        pane.add(phoneTxt, 1, 2);
+        pane.add(search, 0, 3);
+
+        stage.setTitle("Update Employee");
+        stage.setScene(updateEmp);
+        stage.show();
+    };
+
+
 
     public static void main(String[] args) {
 
         Application.launch(args);
-
-        String url = "jdbc:mysql://192.168.1.21:3306/company";
-        String username = "zjs6631";
-        String password = "Simpson1002!";
-        String custQuery = "select * from customers";
-        String empQuery = "select * from employees";
-        System.out.println("Connecting to database...");
-
-        System.out.println("Loading driver...");
-
-
-
-        try (Connection connection = DriverManager.getConnection(url, username, password)){
-            System.out.println("Database Connected");
-            Statement statement = connection.createStatement();
-            ResultSet custResult = statement.executeQuery(custQuery);
-            ResultSet empResult = statement.executeQuery(empQuery);
-            while(custResult.next()){
-
-            }
-
-        } catch (SQLException e){
-            throw new IllegalStateException("Cannot connect to the database!", e);
-        }
-
-
-
     }
 }

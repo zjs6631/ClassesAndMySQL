@@ -12,6 +12,12 @@ public class Company {
     public ArrayList<Employee> employees = new ArrayList<>();
     public ArrayList<Customer> customers = new ArrayList<>();
 
+    public ArrayList<Employee> toAddEmps = new ArrayList<>();
+    public ArrayList<Customer> toAddCusts = new ArrayList<>();
+
+    public ArrayList<Employee> toRemoveEmps = new ArrayList<>();
+    public ArrayList<Customer> toRemoveCusts = new ArrayList<>();
+
     private Company() {
         //make a private constructor so that there is no external access to construction of
         //this object
