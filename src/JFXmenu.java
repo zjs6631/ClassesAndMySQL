@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import java.sql.*;
@@ -84,6 +85,8 @@ public class JFXmenu extends Application {
 
         Label title = new Label("MENU");
 
+        Scene main = new Scene(pane,500, 500);
+
         Button viewEmpBtn = new Button("View Employees");
         Button viewCustBtn = new Button("View Customers");
         Button addEmpBtn = new Button("Add Employee");
@@ -127,8 +130,6 @@ public class JFXmenu extends Application {
         });
 
 
-
-        Scene main = new Scene(pane,500, 500);
         pane.add(title, 0, 0);
         pane.add(viewEmpBtn, 0, 1);
         pane.add(viewCustBtn, 0, 2);
@@ -140,17 +141,14 @@ public class JFXmenu extends Application {
         pane.add(updateCustBtn, 0, 8);
 
 
+        pane.setHgap(10);
+        pane.setVgap(10);
+
+
         stage.setTitle("Main Menu");
         stage.setScene(main);
         stage.show();
 
-
-    }
-
-    class viewHomeHandler implements EventHandler<ActionEvent>{
-        public void handle(ActionEvent e){
-            start(stage);
-        }
 
     }
 
@@ -165,14 +163,23 @@ public class JFXmenu extends Application {
         listEmps.setWrapText(true);
         for(int i = 0; i < business.employees.size(); i++){
             Employee currEmployee = business.employees.get(i);
-            listEmps.appendText(currEmployee.name + " " + currEmployee.address + " " + currEmployee.phone + " " +
-                    currEmployee.birthDate + " " + currEmployee.title + " " + currEmployee.salary + " " + currEmployee.isManager + "\n");
+            listEmps.appendText("Name: " +currEmployee.name + "\n" +
+                    "Address: " + currEmployee.address + "\n" +
+                    "Phone: " + currEmployee.phone + "\n" +
+                    "Birth Date: " + currEmployee.birthDate + "\n" +
+                    "Job Title: " + currEmployee.title + "\n" +
+                    "Salary: $" + String.format("%.2f", currEmployee.salary) + "\n" +
+                    "Manager: " + currEmployee.isManager + "\n\n");
         }
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        toMain.setOnAction(viewHomeHandle);
+        toMain.setOnAction(e->{
+            start(stage);
+        });
 
         pane.getChildren().add(toMain);
         pane.getChildren().add(listEmps);
+
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(30);
 
         stage.setTitle("Employees");
         stage.setScene(viewEmps);
@@ -190,15 +197,21 @@ public class JFXmenu extends Application {
 
         for(int i = 0; i < business.customers.size(); i++){
             Customer currCustomer = business.customers.get(i);
-            listCusts.appendText(currCustomer.name + " " + currCustomer.address + " " + currCustomer.phone + " " +
-                    currCustomer.amountSpent + "\n");
+            listCusts.appendText("Name: " + currCustomer.name + "\n" +
+                    "Address: " + currCustomer.address + "\n" +
+                    "Phone: " + currCustomer.phone + "\n" +
+                    "Amount Spent: $" + String.format("%.2f", currCustomer.amountSpent) + "\n\n");
         }
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        toMain.setOnAction(viewHomeHandle);
+        toMain.setOnAction(e->{
+            start(stage);
+        });
 
         pane.getChildren().add(toMain);
         pane.getChildren().add(listCusts);
+
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(30);
 
         stage.setTitle("Customers");
         stage.setScene(viewEmps);
@@ -218,23 +231,27 @@ public class JFXmenu extends Application {
 
         Label empNamelbl = new Label("Name: ");
         TextArea empNametxt = new TextArea();
-        empNametxt.setMaxHeight(12);
+        empNametxt.setMaxHeight(8);
         empNametxt.setMaxWidth(100);
+        empNamelbl.setMaxWidth(150);
 
         Label empAddresslbl = new Label("Address: ");
         TextArea empAddresstxt = new TextArea();
-        empAddresstxt.setMaxHeight(12);
+        empAddresstxt.setMaxHeight(8);
         empAddresstxt.setMaxWidth(100);
+        empAddresslbl.setMaxWidth(150);
 
         Label empPhonelbl = new Label("Phone (numbers only): ");
         TextArea empPhonetxt = new TextArea();
-        empPhonetxt.setMaxHeight(12);
+        empPhonetxt.setMaxHeight(8);
         empPhonetxt.setMaxWidth(100);
+        empPhonelbl.setMaxWidth(150);
 
         Label empTitlelbl = new Label("Title: ");
         TextArea empTitletxt = new TextArea();
-        empTitletxt.setMaxHeight(12);
+        empTitletxt.setMaxHeight(8);
         empTitletxt.setMaxWidth(100);
+        empTitlelbl.setMaxWidth(150);
 
         final ToggleGroup managerial = new ToggleGroup();
 
@@ -246,19 +263,22 @@ public class JFXmenu extends Application {
 
         Label empBirthDatelbl = new Label("Birth Date (YYYY/MM/DD): ");
         TextArea empBirthDatetxt = new TextArea();
-        empBirthDatetxt.setMaxHeight(12);
+        empBirthDatetxt.setMaxHeight(8);
         empBirthDatetxt.setMaxWidth(100);
+        empBirthDatelbl.setMaxWidth(150);
 
         Label empSalarylbl = new Label("Salary (numbers only): ");
         TextArea empSalarytxt = new TextArea();
-        empSalarytxt.setMaxHeight(12);
+        empSalarytxt.setMaxHeight(8);
         empSalarytxt.setMaxWidth(100);
+        empSalarylbl.setMaxWidth(150);
 
         Label errorLbl = new Label();
 
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        toMain.setOnAction(viewHomeHandle);
+        toMain.setOnAction(e->{
+            start(stage);
+        });
 
 
 
@@ -280,6 +300,7 @@ public class JFXmenu extends Application {
                 if(!Character.isDigit(phoneField.charAt(i))){
                     validPhone = false;
                     errorLbl.setText("Invalid Phone number! Numbers only please.");
+                    errorLbl.setTextFill(Color.web("#ff0000"));
                 }
             }
 
@@ -288,23 +309,28 @@ public class JFXmenu extends Application {
             }catch(NumberFormatException b){
                 validSalary = false;
                 errorLbl.setText("Invalid Salary! Numbers only please.");
+                errorLbl.setTextFill(Color.web("#ff0000"));
             }
 
             if(birthDateField.length() != 10 || birthDateField.charAt(4) != '/' || birthDateField.charAt(7) != '/'){
                 validBirthDate = false;
                 errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                errorLbl.setTextFill(Color.web("#ff0000"));
             }
 
             for(int i = 0; i < birthDateField.length(); i++){
                 if(i <4 && !Character.isDigit(birthDateField.charAt(i))){
                     validBirthDate = false;
                     errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                    errorLbl.setTextFill(Color.web("#ff0000"));
                 } else if (i > 4 && i < 7 && !Character.isDigit(birthDateField.charAt(i))){
                     validBirthDate = false;
                     errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                    errorLbl.setTextFill(Color.web("#ff0000"));
                 } else if (i > 7 && !Character.isDigit(birthDateField.charAt(i))){
                     validBirthDate = false;
                     errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                    errorLbl.setTextFill(Color.web("#ff0000"));
                 }
             }
 
@@ -366,6 +392,9 @@ public class JFXmenu extends Application {
 
         pane.add(errorLbl, 0, 9);
 
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(10);
+
 
         stage.setTitle("Add Employee");
         stage.setScene(addEmps);
@@ -387,28 +416,33 @@ public class JFXmenu extends Application {
 
         Label custNamelbl = new Label("Name: ");
         TextArea custNametxt = new TextArea();
-        custNametxt.setMaxHeight(12);
+        custNametxt.setMaxHeight(8);
         custNametxt.setMaxWidth(100);
+        custNamelbl.setMaxWidth(150);
 
         Label custAddresslbl = new Label("Address: ");
         TextArea custAddresstxt = new TextArea();
-        custAddresstxt.setMaxHeight(12);
+        custAddresstxt.setMaxHeight(8);
         custAddresstxt.setMaxWidth(100);
+        custAddresslbl.setMaxWidth(150);
 
         Label custPhonelbl = new Label("Phone (numbers only): ");
         TextArea custPhonetxt = new TextArea();
-        custPhonetxt.setMaxHeight(12);
+        custPhonetxt.setMaxHeight(8);
         custPhonetxt.setMaxWidth(100);
+        custPhonelbl.setMaxWidth(150);
 
         Label custAmtlbl = new Label("Amount Spent (numbers only): ");
         TextArea custAmttxt = new TextArea();
-        custAmttxt.setMaxHeight(12);
+        custAmttxt.setMaxHeight(8);
         custAmttxt.setMaxWidth(100);
+        custAmtlbl.setMaxWidth(200);
 
         Label errorLabel = new Label();
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        toMain.setOnAction(viewHomeHandle);
+        toMain.setOnAction(e->{
+            start(stage);
+        });
 
         pane.add(toMain,0,0);
         pane.add(custNamelbl, 0, 1);
@@ -427,6 +461,9 @@ public class JFXmenu extends Application {
 
         pane.add(errorLabel, 0, 6);
 
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(10);
+
 
         //EVENT HANDLER using arrow-like syntax to add customer to customer array in business obj
         submit.setOnAction(e -> {
@@ -443,6 +480,7 @@ public class JFXmenu extends Application {
                 if(!Character.isDigit(custPhone.charAt(i))){
                     validPhone = false;
                     errorLabel.setText("Invalid Phone Number provided. Numbers only please.");
+                    errorLabel.setTextFill(Color.web("#ff0000"));
                 }
             }
 
@@ -450,6 +488,7 @@ public class JFXmenu extends Application {
                 if(!Character.isDigit(custAmountSpent.charAt(i))){
                     validAmountSpent = false;
                     errorLabel.setText("Invalid Amount Spent provided. Numbers only please.");
+                    errorLabel.setTextFill(Color.web("#ff0000"));
                 }
             }
             if(validPhone && validAmountSpent) {
@@ -493,21 +532,26 @@ public class JFXmenu extends Application {
 
         Button menu = new Button("MENU");
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        menu.setOnAction(viewHomeHandle);
+        menu.setOnAction(e->{
+            start(stage);
+        });
 
-        Label nameLbl = new Label("Name");
+        Label nameLbl = new Label("Name: ");
         TextArea nameTxt = new TextArea();
 
         nameTxt.setMaxWidth(100);
-        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxHeight(8);
+        nameLbl.setMaxWidth(150);
 
         Label phoneLbl = new Label("Phone");
         TextArea phoneTxt = new TextArea();
         phoneTxt.setMaxWidth(100);
-        phoneTxt.setMaxHeight(12);
+        phoneTxt.setMaxHeight(8);
+        phoneLbl.setMaxWidth(150);
 
         Button submit = new Button("DELETE");
+
+        Label errorLabel = new Label();
 
         submit.setOnAction(e->{
             String name = nameTxt.getText();
@@ -528,13 +572,16 @@ public class JFXmenu extends Application {
                     String updateEmployees = "DELETE FROM employees WHERE (name= '" + name + "' && phone= '"+phone+"')";
                     removeEmployee.executeUpdate(updateEmployees);
                     removeEmployee.close();
+                    start(stage);
                 } else {
-                    System.out.println("Employee not found.");
+                    errorLabel.setText("Employee not found.");
+                    errorLabel.setTextFill(Color.web("#ff0000"));
+
                 }
 
 
 
-                start(stage);
+
 
 
             }catch(SQLException ex){
@@ -549,6 +596,10 @@ public class JFXmenu extends Application {
         pane.add(phoneLbl, 0, 2);
         pane.add(phoneTxt, 1, 2);
         pane.add(submit, 0, 3);
+        pane.add(errorLabel, 0, 4);
+
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(10);
 
         stage.setTitle("Remove Employee");
         stage.setScene(removeEmp);
@@ -564,22 +615,27 @@ public class JFXmenu extends Application {
 
         Button menu = new Button("MENU");
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        menu.setOnAction(viewHomeHandle);
+        menu.setOnAction(e->{
+            start(stage);
+        });
 
         Label nameLbl = new Label("Name");
         TextArea nameTxt = new TextArea();
 
-        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxHeight(8);
         nameTxt.setMaxWidth(100);
+        nameLbl.setMaxWidth(150);
 
         Label phoneLbl = new Label("Phone");
         TextArea phoneTxt = new TextArea();
 
         phoneTxt.setMaxWidth(100);
-        phoneTxt.setMaxHeight(12);
+        phoneTxt.setMaxHeight(8);
+        phoneLbl.setMaxWidth(150);
 
         Button submit = new Button("DELETE");
+
+        Label errorLabel = new Label();
 
         submit.setOnAction(e-> {
                     String name = nameTxt.getText();
@@ -599,11 +655,13 @@ public class JFXmenu extends Application {
                             String updateCustomers = "DELETE FROM customers WHERE (name= '" + name + "' && phone= '" + phone + "')";
                             removeCustomer.executeUpdate(updateCustomers);
                             removeCustomer.close();
+                            start(stage);
                         } else {
-                            System.out.println("Customer not found.");
+                            errorLabel.setText("Customer not found.");
+                            errorLabel.setTextFill(Color.web("#ff0000"));
                         }
 
-                        start(stage);
+
 
                     } catch (SQLException ex) {
                         System.out.println(ex);
@@ -616,6 +674,10 @@ public class JFXmenu extends Application {
         pane.add(phoneLbl, 0, 2);
         pane.add(phoneTxt, 1, 2);
         pane.add(submit, 0, 3);
+        pane.add(errorLabel, 0, 4);
+
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(10);
 
         stage.setTitle("Remove Customer");
         stage.setScene(removeCust);
@@ -630,22 +692,27 @@ public class JFXmenu extends Application {
 
         Button menu = new Button("MENU");
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        menu.setOnAction(viewHomeHandle);
+        menu.setOnAction(e->{
+            start(stage);
+        });
 
         Label nameLbl = new Label("Name");
         TextArea nameTxt = new TextArea();
 
-        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxHeight(8);
         nameTxt.setMaxWidth(100);
+        nameLbl.setMaxWidth(150);
 
         Label phoneLbl = new Label("Phone");
         TextArea phoneTxt = new TextArea();
 
-        phoneTxt.setMaxHeight(12);
+        phoneTxt.setMaxHeight(8);
         phoneTxt.setMaxWidth(100);
+        phoneLbl.setMaxWidth(150);
 
         Button search = new Button("SEARCH");
+
+        Label errorLabel = new Label();
 
         search.setOnAction(e->{
 
@@ -657,6 +724,9 @@ public class JFXmenu extends Application {
             for(Customer customer : business.customers){
                 if(customer.name.equals(targName) && customer.phone.equals(targPhone)){
                     targCustIndex = business.customers.indexOf(customer);
+                } else {
+                    errorLabel.setText("Customer not found.");
+                    errorLabel.setTextFill(Color.web("#ff0000"));
                 }
             }
 
@@ -669,30 +739,34 @@ public class JFXmenu extends Application {
                 TextArea newNameTxt = new TextArea(targetCustomer.name);
 
                 newNameTxt.setMaxWidth(100);
-                newNameTxt.setMaxHeight(12);
+                newNameTxt.setMaxHeight(8);
+                newNameLbl.setMaxWidth(150);
 
                 Label newAddressLbl = new Label("Address: ");
                 TextArea newAddressTxt = new TextArea(targetCustomer.address);
 
-                newAddressTxt.setMaxHeight(12);
+                newAddressTxt.setMaxHeight(8);
                 newAddressTxt.setMaxWidth(100);
+                newAddressLbl.setMaxWidth(150);
 
                 Label newPhoneLbl = new Label("Phone: ");
                 TextArea newPhoneTxt = new TextArea(targetCustomer.phone);
 
                 newPhoneTxt.setMaxWidth(100);
-                newPhoneTxt.setMaxHeight(12);
+                newPhoneTxt.setMaxHeight(8);
+                newPhoneLbl.setMaxWidth(150);
 
                 Label newAmountSpentLbl = new Label("Title: ");
                 TextArea newAmountSpentTxt = new TextArea(targetCustomer.amountSpent.toString());
 
-                newAmountSpentTxt.setMaxHeight(12);
+                newAmountSpentTxt.setMaxHeight(8);
                 newAmountSpentTxt.setMaxWidth(100);
+                newAmountSpentLbl.setMaxWidth(200);
 
 
                 Button submit = new Button("SUBMIT UPDATES");
 
-                Label errorLbl = new Label("");
+                Label errorLbl = new Label();
 
 
                 submit.setOnAction(a->{
@@ -703,6 +777,7 @@ public class JFXmenu extends Application {
                         if(!Character.isDigit(newPhoneTxt.getText().charAt(i))){
                             validPhone = false;
                             errorLbl.setText("Invalid Phone number! Numbers only please.");
+                            errorLbl.setTextFill(Color.web("#ff0000"));
                         }
                     }
 
@@ -711,6 +786,7 @@ public class JFXmenu extends Application {
                     }catch(NumberFormatException b){
                         validSalary = false;
                         errorLbl.setText("Invalid Salary! Numbers only please.");
+                        errorLbl.setTextFill(Color.web("#ff0000"));
                     }
 
 
@@ -740,30 +816,32 @@ public class JFXmenu extends Application {
 
                             System.out.println(updateCustomers);
                         }
-
-
                     }
                 });
 
-                pane.add(newNameLbl, 0, 5);
-                pane.add(newNameTxt, 1, 5);
-                pane.add(newAddressLbl, 0, 6);
-                pane.add(newAddressTxt, 1, 6);
-                pane.add(newPhoneLbl, 0, 7);
-                pane.add(newPhoneTxt, 1, 7);
-                pane.add(newAmountSpentLbl, 0, 8);
-                pane.add(newAmountSpentTxt, 1, 8);
 
-                pane.add(submit, 0, 10);
-                pane.add(errorLbl, 0, 11);
+
+                pane.add(newNameLbl, 0, 6);
+                pane.add(newNameTxt, 1, 6);
+                pane.add(newAddressLbl, 0, 7);
+                pane.add(newAddressTxt, 1, 7);
+                pane.add(newPhoneLbl, 0, 8);
+                pane.add(newPhoneTxt, 1, 8);
+                pane.add(newAmountSpentLbl, 0, 9);
+                pane.add(newAmountSpentTxt, 1, 9);
+
+                pane.add(submit, 0, 11);
+                pane.add(errorLbl, 0, 12);
             }
         });
+
          pane.add(menu, 0, 0);
          pane.add(nameLbl, 0, 1);
          pane.add(nameTxt, 1, 1);
          pane.add(phoneLbl, 0, 2);
          pane.add(phoneTxt, 1, 2);
          pane.add(search, 0, 3);
+         pane.add(errorLabel, 0, 5);
 
         stage.setTitle("Update Customers");
         stage.setScene(updateCust);
@@ -776,22 +854,28 @@ public class JFXmenu extends Application {
 
         Button menu = new Button("MENU");
 
-        viewHomeHandler viewHomeHandle = new viewHomeHandler();
-        menu.setOnAction(viewHomeHandle);
+        menu.setOnAction(e->{
+            start(stage);
+        });
 
         Label nameLbl = new Label("Name");
         TextArea nameTxt = new TextArea();
 
-        nameTxt.setMaxHeight(12);
+        nameTxt.setMaxHeight(8);
         nameTxt.setMaxWidth(100);
+        nameLbl.setMaxWidth(150);
 
         Label phoneLbl = new Label("Phone");
         TextArea phoneTxt = new TextArea();
 
-        phoneTxt.setMaxHeight(12);
+
+        phoneTxt.setMaxHeight(8);
         phoneTxt.setMaxWidth(100);
+        phoneLbl.setMaxWidth(150);
 
         Button search = new Button("SEARCH");
+
+        Label errorLabel = new Label();
 
         search.setOnAction(e->{
 
@@ -815,25 +899,29 @@ public class JFXmenu extends Application {
                 TextArea newNameTxt = new TextArea(targetEmployee.name);
 
                 newNameTxt.setMaxWidth(100);
-                newNameTxt.setMaxHeight(12);
+                newNameTxt.setMaxHeight(8);
+                newNameLbl.setMaxWidth(150);
 
                 Label newAddressLbl = new Label("Address: ");
                 TextArea newAddressTxt = new TextArea(targetEmployee.address);
 
-                newAddressTxt.setMaxHeight(12);
+                newAddressTxt.setMaxHeight(8);
                 newAddressTxt.setMaxWidth(100);
+                newAddressLbl.setMaxWidth(150);
 
                 Label newPhoneLbl = new Label("Phone: ");
                 TextArea newPhoneTxt = new TextArea(targetEmployee.phone);
 
                 newPhoneTxt.setMaxWidth(100);
-                newPhoneTxt.setMaxHeight(12);
+                newPhoneTxt.setMaxHeight(8);
+                newPhoneLbl.setMaxWidth(150);
 
                 Label newTitleLbl = new Label("Title: ");
                 TextArea newTitleTxt = new TextArea(targetEmployee.title);
 
-                newTitleTxt.setMaxHeight(12);
+                newTitleTxt.setMaxHeight(8);
                 newTitleTxt.setMaxWidth(100);
+                newTitleLbl.setMaxWidth(150);
 
                 final ToggleGroup managerial = new ToggleGroup();
 
@@ -846,18 +934,20 @@ public class JFXmenu extends Application {
                 Label newBirthDateLbl = new Label("Birth Date: ");
                 TextArea newBirthDateTxt = new TextArea(targetEmployee.birthDate);
 
-                newBirthDateTxt.setMaxHeight(12);
+                newBirthDateTxt.setMaxHeight(8);
                 newBirthDateTxt.setMaxWidth(100);
+                newBirthDateLbl.setMaxWidth(150);
 
                 Label newSalaryLbl = new Label("Salary: ");
                 TextArea newSalaryTxt = new TextArea(targetEmployee.salary.toString());
 
-                newSalaryTxt.setMaxHeight(12);
+                newSalaryTxt.setMaxHeight(8);
                 newSalaryTxt.setMaxWidth(100);
+                newSalaryLbl.setMaxWidth(150);
 
                 Button submit = new Button("SUBMIT UPDATES");
 
-                Label errorLbl = new Label("");
+                Label errorLbl = new Label();
 
 
                 submit.setOnAction(a->{
@@ -869,6 +959,7 @@ public class JFXmenu extends Application {
                         if(!Character.isDigit(newPhoneTxt.getText().charAt(i))){
                             validPhone = false;
                             errorLbl.setText("Invalid Phone number! Numbers only please.");
+                            errorLbl.setTextFill(Color.web("#ff0000"));
                         }
                     }
 
@@ -877,23 +968,28 @@ public class JFXmenu extends Application {
                     }catch(NumberFormatException b){
                         validSalary = false;
                         errorLbl.setText("Invalid Salary! Numbers only please.");
+                        errorLbl.setTextFill(Color.web("ff0000"));
                     }
 
                     if(newBirthDateTxt.getText().length() != 10 || newBirthDateTxt.getText().charAt(4) != '/' || newBirthDateTxt.getText().charAt(7) != '/'){
                         validBirthDate = false;
                         errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                        errorLbl.setTextFill(Color.web("#ff0000"));
                     }
 
                     for(int i = 0; i < newBirthDateTxt.getText().length(); i++){
                         if(i <4 && !Character.isDigit(newBirthDateTxt.getText().charAt(i))){
                             validBirthDate = false;
                             errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                            errorLbl.setTextFill(Color.web("#ff0000"));
                         } else if (i > 4 && i < 7 && !Character.isDigit(newBirthDateTxt.getText().charAt(i))){
                             validBirthDate = false;
                             errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                            errorLbl.setTextFill(Color.web("#ff0000"));
                         } else if (i > 7 && !Character.isDigit(newBirthDateTxt.getText().charAt(i))){
                             validBirthDate = false;
                             errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
+                            errorLbl.setTextFill(Color.web("#ff0000"));
                         }
                     }
 
@@ -928,6 +1024,9 @@ public class JFXmenu extends Application {
                         }
 
 
+                    } else {
+                        errorLabel.setText("Employee not found.");
+                        errorLabel.setTextFill(Color.web("#ff0000"));
                     }
                 });
 
@@ -955,13 +1054,15 @@ public class JFXmenu extends Application {
         pane.add(phoneLbl, 0, 2);
         pane.add(phoneTxt, 1, 2);
         pane.add(search, 0, 3);
+        pane.add(errorLabel, 0, 4);
+
+        pane.setAlignment(Pos.CENTER);
+        pane.setVgap(10);
 
         stage.setTitle("Update Employee");
         stage.setScene(updateEmp);
         stage.show();
     };
-
-
 
     public static void main(String[] args) {
 
