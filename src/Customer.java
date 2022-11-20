@@ -1,5 +1,5 @@
 import java.util.UUID;
-
+//customer class to create customer objects
 public class Customer {
     public String uniqueID;
     public String name;

@@ -1,5 +1,5 @@
 import java.util.UUID;
-
+//Employee Class to create Employee objects
 public class Employee {
     //class variables
     public String uniqueID;

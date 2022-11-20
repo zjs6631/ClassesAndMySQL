@@ -1,8 +1,5 @@
 //this is the Company class used to create a Singleton class of
 //the company used in this project
-
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Company {
@@ -11,12 +8,6 @@ public class Company {
 
     public ArrayList<Employee> employees = new ArrayList<>();
     public ArrayList<Customer> customers = new ArrayList<>();
-
-    public ArrayList<Employee> toAddEmps = new ArrayList<>();
-    public ArrayList<Customer> toAddCusts = new ArrayList<>();
-
-    public ArrayList<Employee> toRemoveEmps = new ArrayList<>();
-    public ArrayList<Customer> toRemoveCusts = new ArrayList<>();
 
     private Company() {
         //make a private constructor so that there is no external access to construction of
@@ -30,10 +21,4 @@ public class Company {
 
         return company;
     }
-
-    public void addEmp(Employee employee){
-        employees.add(employee);
-    }
-
-
 }
