@@ -262,7 +262,7 @@ public class JFXmenu extends Application {
                 errorLbl.setTextFill(Color.web("#ff0000"));
             }
             //test the birthdate to make sure it is valid
-            if(birthDateField.length() != 10 || (birthDateField.charAt(4) != '/' || birthDateField.charAt(4) != '-') || (birthDateField.charAt(7) != '/' || birthDateField.charAt(7) != '-')){
+            if(birthDateField.length() != 10 || birthDateField.charAt(4) != '/'|| birthDateField.charAt(7) != '/'){
                 validBirthDate = false;
                 errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
                 errorLbl.setTextFill(Color.web("#ff0000"));
@@ -600,9 +600,6 @@ public class JFXmenu extends Application {
             for(Customer customer : business.customers){ //try to find a matching customer and return their index
                 if(customer.name.equals(targName) && customer.phone.equals(targPhone)){
                     targCustIndex = business.customers.indexOf(customer);
-                } else {
-                    errorLabel.setText("Customer not found.");
-                    errorLabel.setTextFill(Color.web("#ff0000"));
                 }
             }
 
@@ -693,6 +690,9 @@ public class JFXmenu extends Application {
                 pane.add(newAmountSpentTxt, 1, 9);
                 pane.add(submit, 0, 11);
                 pane.add(errorLbl, 0, 12);
+            }else {
+                errorLabel.setText("Customer not found.");
+                errorLabel.setTextFill(Color.web("#ff0000"));
             }
         });
         //add elements to the pane
@@ -823,8 +823,8 @@ public class JFXmenu extends Application {
                         errorLbl.setTextFill(Color.web("ff0000"));
                     }
             //make sure birthday is correct length and test characters at the separation points
-                    if(newBirthDateTxt.getText().length() != 10 || (newBirthDateTxt.getText().charAt(4) != '/' || newBirthDateTxt.getText().charAt(4) != '-') ||
-                            (newBirthDateTxt.getText().charAt(7) != '/' || newBirthDateTxt.getText().charAt(7) != '-')){
+                    if(newBirthDateTxt.getText().length() != 10 || newBirthDateTxt.getText().charAt(4) != '/' ||
+                            newBirthDateTxt.getText().charAt(7) != '/'){
                         validBirthDate = false;
                         errorLbl.setText("Invalid Birth Date provided! Make sure it is formatted properly.");
                         errorLbl.setTextFill(Color.web("#ff0000"));
@@ -869,9 +869,6 @@ public class JFXmenu extends Application {
                         } catch (SQLException ex) {
                             ex.printStackTrace();
                         }
-                    } else {
-                        errorLabel.setText("Employee not found.");
-                        errorLabel.setTextFill(Color.web("#ff0000"));
                     }
                 });
             //add the form for new information to the pane
@@ -891,6 +888,9 @@ public class JFXmenu extends Application {
                 pane.add(newSalaryTxt, 1, 11);
                 pane.add(submit, 0, 12);
                 pane.add(errorLbl, 0, 13);
+            } else {
+                errorLabel.setText("Employee not found.");
+                errorLabel.setTextFill(Color.web("#ff0000"));
             }
         });
         //add the initial search form to the pane
